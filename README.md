@@ -1,8 +1,6 @@
-# SHL Conversational Assessment Recommender
+# ABC Corp Conversational Assessment Recommender
 
-A production-grade conversational AI agent that recommends SHL Individual Test Solutions through multi-turn dialogue with hiring managers.
-
-
+A production-grade conversational AI agent that recommends **ABC Corp Individual Test Solutions** through multi-turn dialogue with hiring managers.
 
 ### Key Design Decisions
 
@@ -16,7 +14,7 @@ A production-grade conversational AI agent that recommends SHL Individual Test S
 
 ```bash
 # 1. Clone and setup
-cd shl-recommender
+cd abc-corp-recommender
 python -m venv .venv
 .venv/Scripts/activate  # Windows
 pip install -e ".[dev]"
@@ -35,25 +33,31 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 ## API
 
 ### `GET /health`
+
 Returns `{"status": "ok"}` when ready.
 
 ### `POST /chat`
+
 ```json
 {
   "messages": [
-    {"role": "user", "content": "I need a personality test for a senior engineer"}
+    {
+      "role": "user",
+      "content": "I need a personality test for a senior engineer"
+    }
   ]
 }
 ```
 
 Response:
+
 ```json
 {
   "reply": "Based on your requirements...",
   "recommendations": [
     {
       "name": "Occupational Personality Questionnaire OPQ32r",
-      "url": "https://www.shl.com/products/product-catalog/view/occupational-personality-questionnaire-opq32r/",
+      "url": "https://www.abccorp.com/products/product-catalog/view/occupational-personality-questionnaire-opq32r/",
       "test_type": "P"
     }
   ],
@@ -69,6 +73,7 @@ pytest eval/probes/test_probes.py -v
 ```
 
 ### Metrics Targets
+
 | Metric | Target | Description |
 |--------|--------|-------------|
 | Mean Recall@10 | ≥ 0.75 | Fraction of ground-truth assessments in top-10 |
@@ -82,40 +87,40 @@ pytest eval/probes/test_probes.py -v
 
 ```bash
 python scripts/build_indexes.py    # prerequisite — generates data/
-docker build -t shl-recommender .
-docker run -p 8000:8000 --env-file .env shl-recommender
+docker build -t abc-corp-recommender .
+docker run -p 8000:8000 --env-file .env abc-corp-recommender
 ```
 
 ## Project Structure
 
-```
-shl-recommender/
+```text
+abc-corp-recommender/
 ├── app/
 │   ├── main.py              # FastAPI app + lifespan
-│   ├── config.py             # Pydantic Settings
-│   ├── schemas.py            # Request/Response models
+│   ├── config.py            # Pydantic Settings
+│   ├── schemas.py           # Request/Response models
 │   ├── agent/
-│   │   ├── graph.py          # LangGraph StateGraph wiring
-│   │   ├── state.py          # Slots + AgentState
-│   │   ├── llm.py            # Groq wrapper + prompt loading
-│   │   ├── nodes/            # 9 node implementations
-│   │   └── prompts/          # Prompt templates + SKILL.md
+│   │   ├── graph.py         # LangGraph StateGraph wiring
+│   │   ├── state.py         # Slots + AgentState
+│   │   ├── llm.py           # Groq wrapper + prompt loading
+│   │   ├── nodes/           # 9 node implementations
+│   │   └── prompts/         # Prompt templates + SKILL.md
 │   ├── retrieval/
-│   │   ├── bm25.py           # BM25 retrieval
-│   │   ├── dense.py          # FAISS + bge-small
-│   │   ├── fusion.py         # Reciprocal Rank Fusion
-│   │   └── filters.py        # Hard constraint filters
+│   │   ├── bm25.py          # BM25 retrieval
+│   │   ├── dense.py         # FAISS + bge-small
+│   │   ├── fusion.py        # Reciprocal Rank Fusion
+│   │   └── filters.py       # Hard constraint filters
 │   └── observability/
-│       └── tracing.py        # LangSmith setup
-├── data/                     # Built artifacts (not in git)
+│       └── tracing.py       # LangSmith setup
+├── data/                    # Built artifacts (not in git)
 ├── scripts/
-│   ├── build_indexes.py      # Offline index builder
-│   └── scrape_catalog.py     # Catalog scraper (stub)
+│   ├── build_indexes.py     # Offline index builder
+│   └── scrape_catalog.py    # Catalog scraper (stub)
 ├── eval/
-│   ├── replay.py             # Stateless replay harness
-│   ├── recall.py             # Recall@K metric
+│   ├── replay.py            # Stateless replay harness
+│   ├── recall.py            # Recall@K metric
 │   └── probes/
-│       └── test_probes.py    # 12 behavior probes
+│       └── test_probes.py   # 12 behavior probes
 ├── Dockerfile
 ├── render.yaml
 └── pyproject.toml
@@ -128,3 +133,4 @@ shl-recommender/
 - **Retrieval**: rank_bm25 + FAISS + bge-small-en-v1.5
 - **LLM**: Groq (Llama 3.3 70B / Llama 3.1 8B)
 - **Deployment**: Docker → Render free tier
+````
